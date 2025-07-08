@@ -1,0 +1,6 @@
+cradle:
+  cabal:
+    cabalProject: "./haskell-m269.cabal"
+    components:
+      - path: "./src"
+        component: "haskell-m269:lib:haskell-m269"
