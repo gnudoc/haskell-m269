@@ -1,0 +1,45 @@
+#+TITLE: Haskell 2025 Course Part 3
+#+PROPERTY: header-args:haskell :mkdirp yes :padline no :exports code
+#+AUTHOR: Aijaz M
+#+DATE: <2025-07-08 Tue>
+#+FILETAGS: Haskell:OU:PhilM:2025
+#+DESCRIPTION: Part 3 of Phil Molyneux
+#+OPTIONS: toc:nil num:nil creator:nil tags:nil f:nil d:nil \n:t
+
+* Introduction
+This is a literate programming doc for part 3 of Phil Molyneux's Haskell course. The first two parts were mainly an introduction.
+#+begin_src haskell :tangle ./src/HaskellCourse202503.hs
+  module Haskellcourse202503 where
+#+end_src
+
+* Q1
+Using Prelude library functions, define a function halve that splits an even-lengthed list into two halves.
+#+begin_src haskell :tangle ./src/HaskellCourse202503.hs
+  halve :: [a] -> ([a],[a])
+  halve xs = (take n xs, drop n xs)
+    where n = length xs `div` 2
+#+end_src
+Note there is no error checking here.
+
+* Q2
+Define a function third that returns the third element in a list that contains at least that many elements using:
+a. head and tail
+#+begin_src haskell :tangle ./src/HaskellCourse202503.hs
+  third :: [a] -> a
+  third a = head $ tail $ tail a 
+#+end_src
+
+b. List indexing (!!)
+#+begin_src haskell :tangle ./src/HaskellCourse202503.hs
+  third' :: [a] -> a
+  third' a = a !! 2
+ 
+#+end_src
+
+c. Pattern matching
+#+begin_src haskell :tangle ./src/HaskellCourse202503.hs
+  third'' :: [a] -> a
+  third'' (x1:x2:x3:xs) = x3
+#+end_src
+Note there is no error checking!
+* Q3
