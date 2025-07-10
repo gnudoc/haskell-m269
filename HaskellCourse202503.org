@@ -43,3 +43,109 @@ c. Pattern matching
 #+end_src
 Note there is no error checking!
 * Q3
+Function safetail that behaves the same way as tail except that it
+maps the empty list to itself rather than producing an error.
+• Using tail and null, define safetail using:
+a. a conditional expression
+#+begin_src haskell :tangle ./src/HaskellCourse202503.hs
+  safetail :: [a] -> [a]
+  safetail xs = if null xs then [] else tail xs
+#+end_src
+b. guarded equations
+#+begin_src haskell :tangle ./src/HaskellCourse202503.hs
+  safetail' :: [a] -> [a]
+  safetail' xs
+    | null xs   = []
+    | otherwise = tail xs
+#+end_src
+c. pattern matching
+#+begin_src haskell :tangle ./src/HaskellCourse202503.hs
+  safetail'' :: [a] -> [a]
+  safetail'' [] = []
+  safetail'' (x:xs) = xs
+#+end_src
+
+* Q4
+Define the operator && four different ways using pattern matching
+#+begin_src haskell :tangle ./src/HaskellCourse202503.hs
+  myAND01 :: Bool -> Bool -> Bool
+  myAND01 True True = True
+  myAND01 True False = False
+  myAND01 False True = False
+  myAND01 False False = False
+
+  myAND02 :: Bool -> Bool -> Bool
+  myAND02 True True = True
+  myAND02 _ _ = False
+
+  myAND03 :: Bool -> Bool -> Bool
+  myAND03 True a = a
+  myAND03 False _ = False
+
+  myAND04 :: Bool -> Bool -> Bool
+  myAND04 False False = False
+  myAND04 a b = a == b
+#+end_src
+Define the operator || four different ways using pattern matching
+#+begin_src haskell :tangle ./src/HaskellCourse202503.hs
+  myOR01 :: Bool -> Bool -> Bool
+  myOR01 True True = True
+  myOR01 True False = True
+  myOR01 False True = True
+  myOR01 False False = False
+
+  myOR02 :: Bool -> Bool -> Bool
+  myOR02 False False = False
+  myOR02 _ _ = True
+
+  myOR03 :: Bool -> Bool -> Bool
+  myOR03 False a = a
+  myOR03 True _ = True
+
+  myOR04 :: Bool -> Bool -> Bool
+  myOR04 True True = True
+  myOR04 a b = a /= b
+#+end_src
+* Q5
+show how the meaning of the following pattern matching definition for logical conjunction can be formalised using conditional expressions
+True && True = True
+_    && _    = False
+#+begin_src haskell :tangle ./src/HaskellCourse202503.hs
+  myAnd05 :: Bool -> Bool -> Bool
+  myAnd05 a b =
+    if a then
+      if b then True else False
+    else False
+#+end_src
+* Q6
+True && b = b
+False && _ = False
+#+begin_src haskell :tangle ./src/HaskellCourse202503.hs
+  myAnd06 :: Bool -> Bool -> Bool
+  myAnd06 a b =
+    if a then b
+    else False
+#+end_src
+* Q7
+Show how the meaning of the following curried function can be formalised in terms
+of lambda expressions:
+mult :: Int -> Int -> Int -> Int
+mult x y z = x * y * z
+#+begin_src haskell :tangle ./src/HaskellCourse202503.hs
+  mult :: Int -> Int -> Int -> Int
+  mult = \x -> (\y -> (\z -> x * y * z))
+#+end_src
+* Q8
+Define a function luhnDouble that doubles a digit and subtracts 9 if the result is
+greater than 9
+#+begin_src haskell  :tangle ./src/HaskellCourse202503.hs
+  luhnDouble :: Int -> Int
+  luhnDouble x
+    | 2*x < 10   = 2*x
+    | otherwise  = 2*x - 9
+#+end_src
+define a function luhn that decides if a four-digit bank card number is valid
+#+begin_src haskell  :tangle ./src/HaskellCourse202503.hs
+  luhn :: Int -> Int -> Int -> Int -> Bool
+  luhn a b c d = (luhnDouble a + b + luhnDouble c + d) `mod` 10 == 0
+#+end_src
