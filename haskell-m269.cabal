@@ -18,7 +18,7 @@ common warnings
 
 library
     import:           warnings
-    exposed-modules:  MyLib, HaskellCourse202503
+    exposed-modules:  MyLib, HaskellCourse202503, HaskellCourse202504
     -- other-modules:
     -- other-extensions:
     build-depends:    base ^>=4.18.3.0

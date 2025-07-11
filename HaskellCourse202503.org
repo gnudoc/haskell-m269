@@ -149,3 +149,4 @@ define a function luhn that decides if a four-digit bank card number is valid
   luhn :: Int -> Int -> Int -> Int -> Bool
   luhn a b c d = (luhnDouble a + b + luhnDouble c + d) `mod` 10 == 0
 #+end_src
+* 
