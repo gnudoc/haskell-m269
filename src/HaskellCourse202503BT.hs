@@ -114,13 +114,13 @@ isLeaf :: TreeBT a -> Bool
 isLeaf EmptyBT    = False
 isLeaf (NodeBT _ EmptyBT EmptyBT) = True
 isLeaf (NodeBT _ _ _) = False
---
+--------
 
 numLeaves :: TreeBT a -> Int
 numLeaves EmptyBT = 0
 numLeaves (NodeBT _ EmptyBT EmptyBT) = 1
 numLeaves (NodeBT _ leftBT rightBT) = numLeaves leftBT + numLeaves rightBT
---
+--------
 
 numLeavesAtLevel :: Int -> TreeBT a -> Int
 numLeavesAtLevel target tree = count 0 tree
@@ -140,6 +140,7 @@ numLeavesAtLevel' d t@(NodeBT _ leftBT rightBT)
   | d == 0    = if isLeaf t then 1 else 0
   | d > 0     = numLeavesAtLevel' (d-1) leftBT + numLeavesAtLevel' (d-1) rightBT
   | otherwise = 0
+--------
 
 isFull :: TreeBT a -> Bool
 isFull EmptyBT                   = True
@@ -155,3 +156,56 @@ isFull' (NodeBT _ EmptyBT EmptyBT)    = True
 isFull' (NodeBT _ leftBT rightBT)
   | isFull' leftBT && isFull' rightBT = True
   | otherwise                         = False
+--------
+
+isComplete :: TreeBT a -> Bool
+isComplete tree = checkAsQueue [tree] False -- tree as a queue, and an empty node flag
+  where
+    checkAsQueue :: [TreeBT a] -> Bool -> Bool
+    checkAsQueue [] _ = True -- we got to end of tree
+    checkAsQueue (emptyBT:queue) emptyFlag = checkAsQueue queue True
+    -- ^ set the flag and continue
+    checkAsQueue (NodeBT _ leftBT rightBT : queue) emptyFlag
+      -- ^ non-empty node - now check the flag
+      | emptyFlag = False -- a non-empty node after the flag was set!
+      | otherwise = checkAsQueue (queue ++ [leftBT, rightBT]) False
+      -- ^ non-empty node without empty flag, keep looking
+--------
+
+isPerfect :: TreeBT a -> Bool
+isPerfect tree = s == 2^h - 1
+  where s = sizeBT tree   -- number of nodes
+        h = heightBT tree -- 1-indexed height
+--------
+
+isInTreeBT :: (Eq a) => a -> TreeBT a -> Bool
+isInTreeBT _ EmptyBT = False
+isInTreeBT x (NodeBT nodeX leftBT rightBT)
+  | x == nodeX = True
+  | otherwise  = isInTreeBT x leftBT || isInTreeBT x rightBT
+--------
+
+type KeyedData orig_data = (Int, orig_data)
+
+data KTreeBT a = KEmptyBT
+               | KNodeBT {
+                   getKDataBT :: KeyedData a,
+                   getKLeftBT :: KTreeBT a,
+                   getKRightBT :: KTreeBT a
+                 } deriving (Eq, Read, Show)
+getKey :: KeyedData a -> Int
+getKey (key, _) = key
+getVal :: KeyedData a -> a
+getVal (_, val) = val
+
+lca :: Eq a => TreeBT a -> a -> a -> TreeBT a
+lca EmptyBT _ _ = EmptyBT
+lca tree@(NodeBT val leftBT rightBT) m n
+  |  (val == m || val == n) = tree
+  |  otherwise = let lcaOnLeft = lca leftBT m n
+                     lcaOnRight = lca rightBT m n
+                 in case (isEmptyBT lcaOnLeft, isEmptyBT lcaOnRight) of
+                         (False, False) -> tree
+                         (False, True)  -> lcaOnLeft
+                         (True, False)  -> lcaOnRight
+                         (True, True)   -> EmptyBT
