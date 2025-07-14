@@ -250,6 +250,8 @@ Describe how you could modify the TreeBT datatype to include a key field as part
   getKey (key, _) = key
   getVal :: KeyedData a -> a
   getVal (_, val) = val
+  --------
+  --------
 #+end_src
 ** Binary Tree Exercises 2
 *** Given a BT and 2 items in it, find the lowest common ancestor
