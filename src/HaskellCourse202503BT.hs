@@ -197,6 +197,8 @@ getKey :: KeyedData a -> Int
 getKey (key, _) = key
 getVal :: KeyedData a -> a
 getVal (_, val) = val
+--------
+--------
 
 lca :: Eq a => TreeBT a -> a -> a -> TreeBT a
 lca EmptyBT _ _ = EmptyBT
