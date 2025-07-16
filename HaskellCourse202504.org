@@ -1,0 +1,103 @@
+#+TITLE: Haskell 2025 Course Part 4
+#+PROPERTY: header-args:haskell :mkdirp yes :padline no :exports code
+#+AUTHOR: Aijaz M
+#+DATE: <2025-07-14 Mon>
+#+FILETAGS: Haskell:OU:PhilM:2025
+#+DESCRIPTION: Part 4 of Phil Molyneux
+#+OPTIONS: toc:nil num:nil creator:nil tags:nil f:nil d:nil \n:t
+
+* Introduction
+This is a literate programming doc for part 4 of Phil Molyneux's Haskell course. The first two parts were mainly an introduction.
+#+begin_src haskell :tangle ./src/HaskellCourse202504.hs
+  module Haskellcourse202504 where
+
+  
+#+end_src
+* Thoughts on types
+- Read about the Curry-Howard isomorphism (functions and proofs)
+- Pretty much *everything* has a type, even procedural programming edge cases like void (the Unit type) and crashing/infinite loops (the Bottom type)
+- Haskell effectively has 2 separate languages - the type language and the expression language. The same symbol can mean one thing as a type and another as an expression. This can get confusing - e.g. do `:t ()`
+* Thoughts on lists
+[(x,y) | x <- [0..], y <- [0..]] - conceive of this as an x,y grid - when lazy evaluation is forced, the infinitely long row of (0,y) will never finish being evaluated so no other points get produced.
+[(x,diag-x) | diag <- [0..], x <- [0..diag]] - this does the diagonals of the grid instead - each diagonal is finitely long, even though there are infinitely many of them.
+#+begin_src haskell :tangle ./src/HaskellCourse202504.hs
+  allPairs01 :: [(Integer,Integer)]
+  allPairs01 = [(x,y) | x <- [0..], y <- [0..]]
+
+  allPairs02 :: [(Integer,Integer)]
+  allPairs02 = [(x,diag-x) | diag <- [0..], x <- [0..diag]]
+#+end_src
+Give a definition of the function =disjoint :: (Ord a) => [a] -> [a] -> Bool= that takes two lists in ascending order, and determines whether or not they have an
+element in common.
+#+begin_src haskell  :tangle ./src/HaskellCourse202504.hs
+  disjoint :: (Ord a) => [a] -> [a] -> Bool
+  disjoint _ [] = True
+  disjoint [] _ = True
+  disjoint (x:xs) (y:ys)
+    | x < y     = disjoint xs (y:ys)
+    | x == y    = False
+    | x > y     = disjoint (x:xs) ys
+#+end_src
+#+begin_src haskell :tangle ./src/HaskellCourse202504.hs
+  ram5s n = [(a,b,c,d,a^3 + b^3)
+            | a <- [1..n], b <- [a..n], c <- [a+1..n], d <- [c..n], a^3 + b^3 == c^3 + d^3
+            ]
+#+end_src
+* Higher-order functions
+** map function defined recursively
+#+begin_src haskell :tangle ./src/HaskellCourse202504.hs
+  map1 :: (a -> b) -> [a] -> [b]
+  map1 f [] = []
+  map1 f (x:xs) = f x : map1 f xs
+  
+#+end_src
+** or with a list comprehension
+#+begin_src haskell :tangle ./src/HaskellCourse202504.hs
+  map2 :: (a -> b) -> [a] -> [b]
+  map2 f xs = [f x | x <- xs]
+  
+#+end_src
+** filter defined recursively
+#+begin_src haskell :tangle ./src/HaskellCourse202504.hs
+  filter1 :: (a -> Bool) -> [a] -> [a]
+  filter1 p [] = []
+  filter1 p (x:xs) =
+    if p x then x : filter1 p xs
+           else filter p xs
+#+end_src
+** filter defined with list comprehension
+#+begin_src haskell :tangle ./src/HaskellCourse202504.hs
+  filter2 :: (a -> Bool) -> [a] -> [a]
+  filter2 p xs =[x | x <- xs, p x]
+#+end_src
+** sum and product defined in the same way as foldr
+#+begin_src haskell :tangle ./src/HaskellCourse202504.hs
+  sum1 :: Num a => [a] -> a
+  sum1 [] = 0
+  sum1 (x:xs) = x + sum1 xs
+
+  product1 :: Num a => [a] -> a
+  product1 [] = 1
+  product1 (x:xs) = x * product1 xs
+#+end_src
+  
+** foldr is a generalised version of this
+#+begin_src haskell :tangle ./src/HaskellCourse202504.hs
+  foldr01 f v [] = v -- v is the "final value"
+  foldr01 f v (x:xs) = f x (foldr01 f v xs)
+#+end_src
+** concat as a foldr
+#+begin_src haskell :tangle ./src/HaskellCourse202504.hs
+  concat1 :: [[a]] -> [a]
+  concat1 xss = foldr01 (++) [] xss
+  
+#+end_src
+** map as a foldr
+#+begin_src haskell :tangle ./src/HaskellCourse202504.hs
+  map3 :: (a -> b) -> [a] -> [b]
+  map3 f xs = foldr01 ((:) . f) [] xs -- so the function we apply in each fold is a combination of function to be mapped and the `:`
+
+  -- or as a lambda:
+  map4 :: (a -> b) -> [a] -> [b]
+  map4 f xs = foldr01 (\x xs -> f x : xs) [] xs
+#+end_src
